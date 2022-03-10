@@ -1,0 +1,29 @@
+/* Static Content on Page */
+
+#spreadsheet{
+    margin: auto;
+    margin-top: 500px;
+    border-collapse: collapse;
+}
+
+#spreadsheet td, #spreadsheet th{
+    border: 1px solid black;
+    font-size: 25px;
+    width: 200px;
+    height: 50px;
+    padding-left: 10px;
+}
+
+#spreadsheet th, #spreadsheet td:nth-child(1){
+    background-color: #d0d0d0;
+    text-align: center;
+    font-weight: bold;
+}
+
+
+/* Selected Cells */
+
+.selected{
+    background-color: #e0e0ff;
+}
+
