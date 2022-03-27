@@ -2,15 +2,15 @@
 
 #spreadsheet{
     margin: auto;
-    margin-top: 500px;
+    margin-top: 300px;
     border-collapse: collapse;
 }
 
 #spreadsheet td, #spreadsheet th, input{
     border: 1px solid black;
     font-size: 25px;
-    width: 200px;
-    height: 50px;
+    width: 140px;
+    height: 55px;
     padding-left: 10px;
 }
 
@@ -25,4 +25,11 @@
 
 .selected{
     background-color: #e0e0ff;
+}
+
+
+/* Bar Chart */
+
+#barChart svg{
+    margin-left: 650px;
 }
