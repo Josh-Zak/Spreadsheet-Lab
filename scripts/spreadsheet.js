@@ -1,153 +1,143 @@
 $(document).ready(function(){
+    // fetch the .csv data from localhost
+    fetch('grades.csv')
+        .then((res) => res.text())
+        .then(function(data) {
+            const lines = data.split('\n'); //each line
+            var cells = []; //each value in the csv
+            var lineCells; //each value per line
 
-    // Initialize the IDs for each td cell
-    let row = 1;
-    let col = 1;
-    $('#spreadsheet td').each(function(){
-        $(this).attr('id', '' + row + (col));
-        col++;
-        if(col % 6 == 0){
+            //loop through each line
+            for(let i = 0; i < lines.length; i++){
+                lineCells = lines[i].split(',');
+                $('#spreadsheet').append('<tr></tr>');
+
+                //loop through each value in the csv file
+                for(let j = 0; j < lineCells.length; j++){
+                    if(i == 0){
+                        $('#spreadsheet tr:nth-child(' + (i+1) + ')').append('<th></th>');
+                    }else if(j == 0){
+                        $('#spreadsheet tr:nth-child(' + (i+1) + ')').append('<th></th>');
+                    }else{
+                        $('#spreadsheet tr:nth-child(' + (i+1) + ')').append('<td></td>');
+                    }
+                    cells.push(lineCells[j]);
+                }
+            }
+            //add the value to the cell
+            $("td,th").each(function(i){
+                $(this).text(cells[i]);
+            })
+        })
+        .then(function(){
+            // Initialize the IDs for each td cell
+            let row = 1;
+            let col = 1;
+            $('td').each(function(){
+                $(this).attr('id', '' + row + (col));
+                col++;
+                if(col % 6 == 0){
+                    col = 1;
+                    row++;
+                }
+            });
+
+            
+            // Initialize the IDs for each th cell
             col = 1;
-            row++;
-        }
-    });
+            row = 1;
+            $('#spreadsheet tr:nth-child(1) th').each(function(){
+                if(col == 1){
+                    col++;
+                    return;
+                }
+                $(this).attr('id', 'col' + (col-1));
+                col++;
+            });
+            $('#spreadsheet tr:nth-child(n+2) th').each(function(){
+                $(this).attr('id', 'row' + (row));
+                row++;
+            });
+        })
+        .then(function(){
+            // If the top headers are clicked
+            $('th:nth-child(n+2)').click(function(){
+                deselectAll();
+                selectColumn($(this).attr('id'));
+            });
 
-    // Initialize the IDs for each th cell
-    col = 1;
-    row = 1;
-    $('#spreadsheet tr:nth-child(1) th').each(function(){
-        if(col == 1){
-            col++;
-            return;
-        }
-        $(this).attr('id', 'col' + (col-1));
-        col++;
-    });
-    $('#spreadsheet tr:nth-child(n+2) th').each(function(){
-        $(this).attr('id', 'row' + (row));
-        row++;
-    });
-
-
-    // Dynamically give the values to each td
-    $('#11').text('92.0');
-    $('#12').text('80.0');
-    $('#13').text('100.0');
-    $('#14').text('62.5');
-    $('#15').text('81.5');
-    $('#21').text('100.0');
-    $('#22').text('85.8');
-    $('#23').text('90.0');
-    $('#24').text('75.0');
-    $('#25').text('90.25');
-    $('#31').text('80.0');
-    $('#32').text('90.5');
-    $('#33').text('90.0');
-    $('#34').text('66.5');
-    $('#35').text('68.0');
-    $('#41').text('100.0');
-    $('#42').text('100.0');
-    $('#43').text('100.0');
-    $('#44').text('98.0');
-    $('#45').text('95.5');
-    $('#51').text('100.0');
-    $('#52').text('90.0');
-    $('#53').text('100.0');
-    $('#54').text('58.5');
-    $('#55').text('72.0');
-    $('#61').text('90.5');
-    $('#62').text('81.5');
-    $('#63').text('95.5');
-    $('#64').text('65.5');
-    $('#65').text('64.0');
-    $('#71').text('40.5');
-    $('#72').text('50.5');
-    $('#73').text('65.5');
-    $('#74').text('22.5');
-    $('#75').text('51.0');
-    $('#81').text('70.0');
-    $('#82').text('75.5');
-    $('#83').text('70.0');
-    $('#84').text('55.5');
-    $('#85').text('21.0');
-    $('#91').text('80.0');
-    $('#92').text('82.5');
-    $('#93').text('65.0');
-    $('#94').text('72.5');
-    $('#95').text('88.0');
+            // If the left headers are clicked
+            $('tr:nth-child(n+2) th').click(function(){
+                deselectAll();
+                selectRow($(this).attr('id'));
+            });
 
 
-    // If the top headers are clicked
-    $('th:nth-child(n+2)').click(function(){
-        deselectAll();
-        selectColumn($(this).attr('id'));
-    });
-
-    // If the left headers are clicked
-    $('tr:nth-child(n+2) th').click(function(){
-        deselectAll();
-        selectRow($(this).attr('id'));
-    });
-
-
-    //deselect everything
-    function deselectAll(){
-        $('td').removeClass('selected');
-    }
-
-    //select everything from rowID
-    function selectRow(rowID){
-        let rowIndex = rowID.substring(3)
-        $('td').each(function(){
-            let colVal = ($(this).attr('id') - 1) % 5 + 1;
-            if ($(this).attr('id') - colVal == rowIndex * 10){
-                $(this).addClass('selected');
+            //deselect everything
+            function deselectAll(){
+                $('td').removeClass('selected');
             }
+
+            //select everything from rowID
+            function selectRow(rowID){
+                let rowIndex = rowID.substring(3)
+                $('td').each(function(){
+                    let colVal = ($(this).attr('id') - 1) % 5 + 1;
+                    if ($(this).attr('id') - colVal == rowIndex * 10){
+                        $(this).addClass('selected');
+                    }
+                });
+
+                chartValues();
+            }
+
+            //select everything from colID
+            function selectColumn(colID){
+                let colIndex = colID.substring(3)
+                $('td').each(function(){
+                    // if ($(this).attr('id') % 5 == colIndex || (colIndex == 5 && $(this).attr('id') % 5 == 0)){
+                    if (($(this).attr('id') - 1) % 5 + 1 == colIndex){
+                        $(this).addClass('selected');
+                    }
+                });
+                chartValues();
+            }
+
+            //when td is clicked
+            $('td').click(function(){
+                deselectAll();
+
+                //save old values
+                let value = $(this).text();
+                let id = $(this).attr('id');
+
+                var textField = $('<input type="text" />');
+                textField.val(value);
+                textField.attr('id', id);
+                textField.addClass('selected');
+                $(this).replaceWith(textField);
+
+                //on ENTER press
+                $(textField).keypress(function(event) {
+                    if (event.which == 13) {
+                        value = $(this).val();
+                        
+                        var td = $('<td></td>');
+                        td.attr('id', id);
+                        td.text(value);
+                        td.addClass('selected');
+                        $(this).replaceWith(td);
+                    }
+                });
+
+            });
+        })
+        .catch(function(error) {
+            console.log(error);
         });
 
-        chartValues();
-    }
 
-    //select everything from colID
-    function selectColumn(colID){
-        let colIndex = colID.substring(3)
-        $('td').each(function(){
-            // if ($(this).attr('id') % 5 == colIndex || (colIndex == 5 && $(this).attr('id') % 5 == 0)){
-            if (($(this).attr('id') - 1) % 5 + 1 == colIndex){
-                $(this).addClass('selected');
-            }
-        });
-        chartValues();
-    }
-
-    //when td is clicked
-    $('td').click(function(){
-        deselectAll();
-
-        //save old values
-        let value = $(this).text();
-        let id = $(this).attr('id');
-
-        var textField = $('<input type="text" />');
-        textField.val(value);
-        textField.attr('id', id);
-        textField.addClass('selected');
-        $(this).replaceWith(textField);
-
-        //on ENTER press
-        $(textField).keypress(function(event) {
-            if (event.which == 13) {
-                value = $(this).val();
-                
-                var td = $('<td></td>');
-                td.attr('id', id);
-                td.text(value);
-                td.addClass('selected');
-                $(this).replaceWith(td);
-            }
-        });
-
-    });
+    
 
 
     function getGrade(mark) {

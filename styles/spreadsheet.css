@@ -30,6 +30,6 @@
 
 /* Bar Chart */
 
-#barChart svg{
-    margin-left: 650px;
+#barChart g{
+    margin: auto;
 }
